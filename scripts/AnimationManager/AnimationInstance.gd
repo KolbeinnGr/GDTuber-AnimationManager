@@ -1,7 +1,6 @@
-class_name AnimationInstance extends AnimatedSprite2D
+class_name AnimationInstance extends Animation
 
+var source_image: ImageTexture
 var priority: int = 0
-
-func initialize():
-	self.get_sprite_frames()
-	pass
+var uuid : int
+var cells : Array[AnimationCell] = []

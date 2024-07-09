@@ -8,14 +8,19 @@ extends Control
 @onready var animation_list: ItemList = %AnimationList
 @onready var file_dialog: FileDialog = %FileDialog
 @onready var file_dialog_button: Button = %FileDialogButton
+@onready var frames_container: HBoxContainer = %FramesContainer
+
 
 var rows : int = 2
 var columns : int = 2
-var redraw_cells : bool = false
+var should_redraw_cells : bool = false
 var image_size : Vector2
+var animations : Animation
+var animations_folder : String = "res://animations/"
 
 var cells : Array[AnimationCell] = []
 var openingfor : Sprite2D
+
 
 func _ready():
 	if self.animation_manager == null:
@@ -26,6 +31,7 @@ func _ready():
 	
 	if animation_list:
 		self.animation_list.custom_minimum_size = Vector2(200, 300)
+		_load_saved_animations()
 	if file_dialog_button:
 		file_dialog_button.connect("pressed", _on_file_button_button_down)
 	if file_dialog:
@@ -38,9 +44,9 @@ func _ready():
 	_draw_cells()
 
 func _process(_delta):
-	if redraw_cells:
+	if self.should_redraw_cells:
 		_draw_cells()
-		redraw_cells = false
+		self.should_redraw_cells = false
 
 func _draw_cells():
 	if !image:
@@ -59,14 +65,15 @@ func _draw_cells():
 			var new_pos : Vector2 = Vector2(image.position.x - image_size.x/2 + j * cell_width, image.position.y - image_size.y/2 + i * cell_height)
 			if cells.size() > counter:
 				cell = cells[counter]
-				cell.update_cell(i, j, cell_width, cell_height, new_pos)
+				cell.update_cell(i, j, cell_width, cell_height, new_pos, counter)
 			else:
 				cell = AnimationCell.new()
-				cell.animation_manager = animation_manager
-				cell.update_cell(i, j, cell_width, cell_height, new_pos)
+				cell.update_cell(i, j, cell_width, cell_height, new_pos, counter)
+				cell.connect("redraw_cells", _on_redraw_cells)
+				cell.connect("pressed_animation_cell", _on_pressed_animation_cell)
 				cells.append(cell)
 				center_container.add_child(cell)
-
+				
 			counter += 1
 
 func _on_animation_manager_button_pressed():
@@ -114,9 +121,50 @@ func _on_file_dialog_file_selected(path):
 		if err != OK:
 			print("Failed to load image")
 			return
-		var texture = ImageTexture.create_from_image(img)
 
+		var texture = ImageTexture.create_from_image(img)
 		openingfor.texture = texture
 		self.image.texture = texture
 		
-		self.redraw_cells = true
+		self.should_redraw_cells = true
+
+func _load_saved_animations():
+	# Load the saved animations from the folder and populate the animation list
+	var dir = DirAccess.open(animations_folder)
+	if dir:
+		dir.list_dir_begin()
+		var file_name = dir.get_next()
+		while file_name != "":
+			if file_name.starts_with("animation_"):
+				print("Loading animation: " + file_name)
+			else:
+				print("Skipping file: " + file_name)
+			file_name = dir.get_next()
+	else:
+		print("Failed to open directory: " + animations_folder)
+
+func _on_redraw_cells():
+	self.should_redraw_cells = true
+
+func _on_pressed_animation_cell(uid: int):
+	print("Pressed cell with uid: " + str(uid))
+	var selected_cell = cells[uid]
+
+	# get the rect of the selected cell
+	var atlas_texture = AtlasTexture.new()
+	var atlas_rect = Rect2(selected_cell.position + Vector2(selected_cell.width, selected_cell.height) - image.position, Vector2(selected_cell.width, selected_cell.height))
+	print("Atlas rect: " + str(atlas_rect))
+	print("Image position: " + str(image.position))
+	atlas_texture.atlas = image.texture
+	atlas_texture.region = atlas_rect
+
+	var new_sprite = Sprite2D.new()
+	new_sprite.texture = atlas_texture
+
+	# add the new sprite to the frames container
+	var sprite_container = PanelContainer.new()
+	new_sprite.scale = Vector2(2,2)
+	sprite_container.custom_minimum_size = Vector2(selected_cell.width, selected_cell.height) * new_sprite.scale
+	sprite_container.add_child(new_sprite)
+	
+	frames_container.add_child(sprite_container)

@@ -182,10 +182,10 @@ use_native_dialog = true
 
 [node name="AnimationManager" parent="." instance=ExtResource("6_cmfr8")]
 layout_mode = 1
-offset_left = -910.0
-offset_top = -359.0
-offset_right = 1090.0
-offset_bottom = 541.0
+offset_left = -385.0
+offset_top = -470.0
+offset_right = 815.0
+offset_bottom = 430.0
 
 [connection signal="gui_input" from="." to="." method="_on_gui_input"]
 [connection signal="drag_ended" from="Menu/PanelContainer/VBoxContainer/HBoxContainer/ThesholdSlider" to="." method="_on_v_slider_drag_ended"]
