@@ -1,10 +1,11 @@
-[gd_scene load_steps=8 format=3 uid="uid://dvjlkpjvjxn0h"]
+[gd_scene load_steps=9 format=3 uid="uid://dvjlkpjvjxn0h"]
 
 [ext_resource type="Script" path="res://scripts/MicRecord.gd" id="1"]
 [ext_resource type="Texture2D" uid="uid://c5fl4pf7cxwvc" path="res://gizmo.png" id="3_kgjae"]
 [ext_resource type="Theme" uid="uid://d18y4voshb0um" path="res://Menu Theme.tres" id="3_lar1l"]
 [ext_resource type="Script" path="res://scripts/gizmo.gd" id="4_6j4ar"]
 [ext_resource type="Script" path="res://scripts/Menu.gd" id="4_l3c8m"]
+[ext_resource type="PackedScene" uid="uid://bvqks084phcj7" path="res://scenes/animation_manager.tscn" id="6_cmfr8"]
 
 [sub_resource type="AudioStreamMicrophone" id="1"]
 
@@ -140,6 +141,10 @@ text = "Press any key to open this menu again"
 horizontal_alignment = 1
 autowrap_mode = 2
 
+[node name="AnimationManagerButton" type="Button" parent="Menu/PanelContainer/VBoxContainer"]
+layout_mode = 2
+text = "Animation Manager"
+
 [node name="CloseButton" type="Button" parent="Menu/PanelContainer/VBoxContainer"]
 layout_mode = 2
 text = "Close"
@@ -175,10 +180,18 @@ access = 2
 filters = PackedStringArray("*.png, *.jpg, *.jpeg, *.bmp, *.dds, *.ktx, *.exr, *.hdr, *.tga, *.svg, *.webp")
 use_native_dialog = true
 
+[node name="AnimationManager" parent="." instance=ExtResource("6_cmfr8")]
+layout_mode = 1
+offset_left = -910.0
+offset_top = -359.0
+offset_right = 1090.0
+offset_bottom = 541.0
+
 [connection signal="gui_input" from="." to="." method="_on_gui_input"]
 [connection signal="drag_ended" from="Menu/PanelContainer/VBoxContainer/HBoxContainer/ThesholdSlider" to="." method="_on_v_slider_drag_ended"]
 [connection signal="pressed" from="Menu/PanelContainer/VBoxContainer/ScrollContainer/VBoxContainer/Button" to="Menu" method="_create_new_object"]
 [connection signal="button_down" from="Menu/PanelContainer/VBoxContainer/FileButton" to="Menu" method="_on_file_button_button_down"]
+[connection signal="pressed" from="Menu/PanelContainer/VBoxContainer/AnimationManagerButton" to="AnimationManager" method="_on_animation_manager_button_pressed"]
 [connection signal="button_down" from="Menu/PanelContainer/VBoxContainer/CloseButton" to="Menu" method="_on_button_button_down"]
 [connection signal="button_down" from="Menu/PanelContainer/VBoxContainer/QuitButton" to="Menu" method="_on_quit_button_button_down"]
 [connection signal="button_down" from="Menu/Gizmo/Button" to="Menu/Gizmo" method="drag"]

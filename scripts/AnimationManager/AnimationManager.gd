@@ -1,0 +1,122 @@
+extends Control
+
+@onready var animation_manager : AspectRatioContainer = $"."
+@onready var image : Sprite2D = %SpriteImage
+@onready var center_container : Control = %CenterContainer
+@onready var rows_text: LineEdit = %RowsText
+@onready var cols_text: LineEdit = %ColsText
+@onready var animation_list: ItemList = %AnimationList
+@onready var file_dialog: FileDialog = %FileDialog
+@onready var file_dialog_button: Button = %FileDialogButton
+
+var rows : int = 2
+var columns : int = 2
+var redraw_cells : bool = false
+var image_size : Vector2
+
+var cells : Array[AnimationCell] = []
+var openingfor : Sprite2D
+
+func _ready():
+	if self.animation_manager == null:
+		animation_manager = get_node("AnimationManager")
+		if animation_manager == null:
+			print("AnimationManager node not found!")
+	animation_manager.visible = false
+	
+	if animation_list:
+		self.animation_list.custom_minimum_size = Vector2(200, 300)
+	if file_dialog_button:
+		file_dialog_button.connect("pressed", _on_file_button_button_down)
+	if file_dialog:
+		file_dialog.connect("file_selected", _on_file_dialog_file_selected)
+	if rows_text:
+		rows_text.text = str(rows)
+	if cols_text:
+		cols_text.text = str(columns)
+
+	_draw_cells()
+
+func _process(_delta):
+	if redraw_cells:
+		_draw_cells()
+		redraw_cells = false
+
+func _draw_cells():
+	if !image:
+		print("Image is not assigned")
+		return
+
+	image_size = image.texture.get_size()
+	var cell_width : int = image_size.x / columns
+	var cell_height : int = image_size.y / rows
+	var counter : int = 0
+
+	for i in range(rows):
+		for j in range(columns):
+			# check if the cell has already been created if so, update the cell, otherwise create a new cell
+			var cell
+			var new_pos : Vector2 = Vector2(image.position.x - image_size.x/2 + j * cell_width, image.position.y - image_size.y/2 + i * cell_height)
+			if cells.size() > counter:
+				cell = cells[counter]
+				cell.update_cell(i, j, cell_width, cell_height, new_pos)
+			else:
+				cell = AnimationCell.new()
+				cell.animation_manager = animation_manager
+				cell.update_cell(i, j, cell_width, cell_height, new_pos)
+				cells.append(cell)
+				center_container.add_child(cell)
+
+			counter += 1
+
+func _on_animation_manager_button_pressed():
+	animation_manager.visible = !animation_manager.visible
+
+func _on_rows_add_button_pressed() -> void:
+	self.rows += 1
+	_update_rows_cols_texts()
+
+func _on_rows_sub_button_pressed() -> void:
+	if self.rows > 1:
+		self.rows -= 1
+		_update_rows_cols_texts()
+
+func _on_cols_sub_button_pressed() -> void:
+	if self.columns > 1:
+		self.columns -= 1
+		_update_rows_cols_texts()
+
+func _on_cols_add_button_pressed() -> void:
+	self.columns += 1
+	_update_rows_cols_texts()
+
+func _update_rows_cols_texts():
+	if rows_text:
+		rows_text.text = str(rows)
+	if cols_text:
+		cols_text.text = str(columns)
+
+	# when the rows or columns are updated, we need to delete all the cells and lines and redraw them
+	for cell in cells:
+		cell.queue_free()
+	cells.clear()
+	_draw_cells()
+
+func _on_file_button_button_down():
+	# Set the requestor (image) and show the file dialog
+	openingfor = image
+	file_dialog.popup_centered()
+
+func _on_file_dialog_file_selected(path):
+	if openingfor:
+		var img = Image.new()
+		var err = img.load(path)
+		if err != OK:
+			print("Failed to load image")
+			return
+		var texture = ImageTexture.create_from_image(img)
+
+		openingfor.texture = texture
+		self.image.texture = texture
+		
+		self.redraw_cells = true
