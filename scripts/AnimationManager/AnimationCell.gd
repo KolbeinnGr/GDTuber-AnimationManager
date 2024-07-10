@@ -10,6 +10,7 @@ var height : int
 var selected : bool = false
 var button_style : StyleBoxFlat = StyleBoxFlat.new()
 var uid : int
+var rect : Rect2
 
 func _ready():
 	self.button_style.set_border_width_all(1)
@@ -25,7 +26,7 @@ func update_cell(_row: int, _col : int, _width: int, _height: int, new_position:
 	self.height = _height
 	self.position = new_position
 	self.uid = new_uid
-	
+	self.rect = Rect2(Vector2.ZERO + Vector2(_width * _col, _row * _height), Vector2(_width, _height))
 	# set the size and color of the button
 	self.custom_minimum_size = Vector2(self.width, self.height)
 	if self.selected:
@@ -39,6 +40,5 @@ func is_selected() -> bool:
 	return self.selected
 
 func _on_pressed_animation_cell() -> void:
-	self.selected = !self.selected
-	emit_signal("redraw_cells")
 	pressed_animation_cell.emit(self.uid)
+	emit_signal("redraw_cells")

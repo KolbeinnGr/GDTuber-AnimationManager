@@ -147,24 +147,30 @@ func _on_redraw_cells():
 	self.should_redraw_cells = true
 
 func _on_pressed_animation_cell(uid: int):
-	print("Pressed cell with uid: " + str(uid))
 	var selected_cell = cells[uid]
 
-	# get the rect of the selected cell
-	var atlas_texture = AtlasTexture.new()
-	var atlas_rect = Rect2(selected_cell.position + Vector2(selected_cell.width, selected_cell.height) - image.position, Vector2(selected_cell.width, selected_cell.height))
-	print("Atlas rect: " + str(atlas_rect))
-	print("Image position: " + str(image.position))
-	atlas_texture.atlas = image.texture
-	atlas_texture.region = atlas_rect
+	selected_cell.selected = !selected_cell.selected
+	if selected_cell.selected:
+		# get the rect of the selected cell
+		var atlas_texture = AtlasTexture.new()
+		var atlas_rect = selected_cell.rect
+		atlas_texture.atlas = image.texture
+		atlas_texture.region = atlas_rect
+		
+		var new_sprite = Sprite2D.new()
+		new_sprite.name = str(uid)
+		new_sprite.texture = atlas_texture
+		new_sprite.scale = Vector2(2,2)
 
-	var new_sprite = Sprite2D.new()
-	new_sprite.texture = atlas_texture
-
-	# add the new sprite to the frames container
-	var sprite_container = PanelContainer.new()
-	new_sprite.scale = Vector2(2,2)
-	sprite_container.custom_minimum_size = Vector2(selected_cell.width, selected_cell.height) * new_sprite.scale
-	sprite_container.add_child(new_sprite)
-	
-	frames_container.add_child(sprite_container)
+		# add the new sprite to the frames container
+		var sprite_container = CenterContainer.new()
+		sprite_container.custom_minimum_size = Vector2(selected_cell.width, selected_cell.height) * new_sprite.scale
+		sprite_container.add_child(new_sprite)
+		
+		frames_container.add_child(sprite_container)
+	else:
+		# remove the sprite from the frames container
+		for frame in frames_container.get_children():
+			for child in frame.get_children():
+				if child.name == str(uid):
+					frame.queue_free()
