@@ -68,6 +68,19 @@ horizontal_alignment = 1
 [node name="VBoxContainer2" type="VBoxContainer" parent="HBoxContainer/AnimationEditor/VBoxContainer"]
 layout_mode = 2
 
+[node name="Container" type="FlowContainer" parent="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="NameLabel" type="Label" parent="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/Container"]
+layout_mode = 2
+text = "Name"
+
+[node name="NameTextEdit" type="LineEdit" parent="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/Container"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(250, 0)
+layout_mode = 2
+
 [node name="HBoxContainer" type="HBoxContainer" parent="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2"]
 layout_mode = 2
 
@@ -151,7 +164,15 @@ unique_name_in_owner = true
 custom_minimum_size = Vector2(450, 0)
 layout_mode = 2
 
+[node name="CenterContainer" type="CenterContainer" parent="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2"]
+layout_mode = 2
+
+[node name="SaveButton" type="Button" parent="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/CenterContainer"]
+layout_mode = 2
+text = "Save"
+
 [connection signal="pressed" from="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/RowsHBoxContainer/Button2" to="." method="_on_rows_sub_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/RowsHBoxContainer/Button" to="." method="_on_rows_add_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/ColsHBoxContainer2/Button2" to="." method="_on_cols_sub_button_pressed"]
 [connection signal="pressed" from="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/HBoxContainer/VBoxContainer/ColsHBoxContainer2/Button" to="." method="_on_cols_add_button_pressed"]
+[connection signal="pressed" from="HBoxContainer/AnimationEditor/VBoxContainer/VBoxContainer2/CenterContainer/SaveButton" to="." method="_on_save_button_pressed"]

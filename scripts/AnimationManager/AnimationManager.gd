@@ -9,6 +9,7 @@ extends Control
 @onready var file_dialog: FileDialog = %FileDialog
 @onready var file_dialog_button: Button = %FileDialogButton
 @onready var frames_container: HBoxContainer = %FramesContainer
+@onready var name_text_edit: LineEdit = %NameTextEdit
 
 
 var rows : int = 2
@@ -135,8 +136,9 @@ func _load_saved_animations():
 		dir.list_dir_begin()
 		var file_name = dir.get_next()
 		while file_name != "":
-			if file_name.starts_with("animation_"):
+			if file_name.begins_with("animation_"):
 				print("Loading animation: " + file_name)
+				_load_animation_from_file(animations_folder + file_name)
 			else:
 				print("Skipping file: " + file_name)
 			file_name = dir.get_next()
@@ -174,3 +176,29 @@ func _on_pressed_animation_cell(uid: int):
 			for child in frame.get_children():
 				if child.name == str(uid):
 					frame.queue_free()
+
+
+func _on_save_button_pressed() -> void:
+	print("Saving")
+	var new_animation : AnimationInstance = AnimationInstance.new()
+	new_animation.name = name_text_edit.text
+	new_animation.source_image = image.texture
+	new_animation.cells = cells
+	#generate a new uuid using the current time
+	new_animation.uuid = int(Time.get_unix_time_from_system())
+
+	# save the animation to a file using resourceSaver
+	var result = ResourceSaver.save(new_animation, animations_folder + "animation_" + str(new_animation.uuid) + ".tres")
+
+	if result == OK:
+		print("Animation saved successfully with id: ", new_animation.uuid)
+	else:
+		print("Failed to save animation")
+
+
+func _load_animation_from_file(path: String) -> AnimationInstance:
+	var animation : AnimationInstance = ResourceLoader.load(path)
+	print("Loaded animation: " + animation.name)
+	print("UUID: " + str(animation.uuid))
+	print("Cells: " + str(animation.cells.size()))
+	return animation

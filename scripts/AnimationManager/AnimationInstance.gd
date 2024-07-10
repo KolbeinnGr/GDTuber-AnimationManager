@@ -1,6 +1,7 @@
 class_name AnimationInstance extends Animation
 
-var source_image: ImageTexture
-var priority: int = 0
-var uuid : int
+@export var source_image: ImageTexture
+@export var name : String
+@export var priority: int = 0
+@export var uuid : int
 var cells : Array[AnimationCell] = []
