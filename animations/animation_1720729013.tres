@@ -1,0 +1,6 @@
+[gd_resource type="Animation" script_class="AnimationInstance" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/AnimationManager/AnimationInstance.gd" id="1_x4umt"]
+
+[resource]
+script = ExtResource("1_x4umt")

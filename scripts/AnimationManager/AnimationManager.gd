@@ -196,9 +196,13 @@ func _on_save_button_pressed() -> void:
 		print("Failed to save animation")
 
 
+01,3
 func _load_animation_from_file(path: String) -> AnimationInstance:
+
 	var animation : AnimationInstance = ResourceLoader.load(path)
 	print("Loaded animation: " + animation.name)
 	print("UUID: " + str(animation.uuid))
 	print("Cells: " + str(animation.cells.size()))
 	return animation
+ 6æ7ujK(ÞIL
+ -

@@ -42,3 +42,24 @@ func is_selected() -> bool:
 func _on_pressed_animation_cell() -> void:
 	pressed_animation_cell.emit(self.uid)
 	emit_signal("redraw_cells")
+
+func _to_dict() -> Dictionary:
+	return {
+		"row": self.row,
+		"col": self.col,
+		"width": self.width,
+		"height": self.height,
+		"selected": self.selected,
+		"uid": self.uid
+	}
+
+func _from_dict(data: Dictionary) -> void:
+	# Check if the data is valid
+	if data == null:
+		print_debug("Error: Cell data is null")
+		return
+	elif data.has_all(["row", "col", "width", "height", "selected", "uid"]) == false:
+		print_debug("Error: Cell data is missing keys")
+		return
+
+	self.update_cell(data["row"], data["col"], data["width"], data["height"], data["selected"], data["uid"])
