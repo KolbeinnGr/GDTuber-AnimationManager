@@ -40,10 +40,13 @@ text = "Animations"
 
 [node name="AnimationList" type="ItemList" parent="HBoxContainer/AnimationLister/VBoxContainer"]
 unique_name_in_owner = true
-custom_minimum_size = Vector2(125, 300)
 layout_mode = 2
 auto_height = true
+text_overrun_behavior = 0
+item_count = 2
 max_columns = 2
+item_0/text = "Animation one"
+item_1/text = "Animation 2"
 
 [node name="CreateAnimationButton" type="Button" parent="HBoxContainer/AnimationLister/VBoxContainer"]
 layout_mode = 2

@@ -3,6 +3,8 @@ class_name AnimationCell extends Button
 signal redraw_cells
 signal pressed_animation_cell
 
+const FIELDS: Array[String] = ["row", "col", "width", "height", "selected", "uid"]
+
 var row : int
 var col : int
 var width : int
@@ -43,7 +45,7 @@ func _on_pressed_animation_cell() -> void:
 	pressed_animation_cell.emit(self.uid)
 	emit_signal("redraw_cells")
 
-func _to_dict() -> Dictionary:
+func to_dict() -> Dictionary:
 	return {
 		"row": self.row,
 		"col": self.col,
@@ -53,12 +55,12 @@ func _to_dict() -> Dictionary:
 		"uid": self.uid
 	}
 
-func _from_dict(data: Dictionary) -> void:
+func from_dict(data: Dictionary) -> void:
 	# Check if the data is valid
 	if data == null:
 		print_debug("Error: Cell data is null")
 		return
-	elif data.has_all(["row", "col", "width", "height", "selected", "uid"]) == false:
+	elif data.has_all(self.FIELDS) == false:
 		print_debug("Error: Cell data is missing keys")
 		return
 

@@ -18,6 +18,7 @@ var should_redraw_cells : bool = false
 var image_size : Vector2
 var animations : Animation
 var animations_folder : String = "res://animations/"
+var should_update_file_list : bool = false
 
 var cells : Array[AnimationCell] = []
 var openingfor : Sprite2D
@@ -48,6 +49,8 @@ func _process(_delta):
 	if self.should_redraw_cells:
 		_draw_cells()
 		self.should_redraw_cells = false
+	if should_update_file_list:
+		_update_file_list()
 
 func _draw_cells():
 	if !image:
@@ -55,8 +58,8 @@ func _draw_cells():
 		return
 
 	image_size = image.texture.get_size()
-	var cell_width : int = image_size.x / columns
-	var cell_height : int = image_size.y / rows
+	var cell_width : int = int(image_size.x / columns)
+	var cell_height : int = int(image_size.y / rows)
 	var counter : int = 0
 
 	for i in range(rows):
@@ -76,6 +79,14 @@ func _draw_cells():
 				center_container.add_child(cell)
 				
 			counter += 1
+	
+func _update_file_list():
+	if should_update_file_list:
+		# get the list of files in the animations folder
+		var files = FileManager.new().get_files_that_begin_with(animations_folder, "animation_")
+		for file in files:
+			animation_list.add_item(file)
+		should_update_file_list = false
 
 func _on_animation_manager_button_pressed():
 	animation_manager.visible = !animation_manager.visible
@@ -138,7 +149,7 @@ func _load_saved_animations():
 		while file_name != "":
 			if file_name.begins_with("animation_"):
 				print("Loading animation: " + file_name)
-				_load_animation_from_file(animations_folder + file_name)
+				_load_animation_from_file(animations_folder, file_name)
 			else:
 				print("Skipping file: " + file_name)
 			file_name = dir.get_next()
@@ -179,30 +190,30 @@ func _on_pressed_animation_cell(uid: int):
 
 
 func _on_save_button_pressed() -> void:
-	print("Saving")
 	var new_animation : AnimationInstance = AnimationInstance.new()
 	new_animation.name = name_text_edit.text
-	new_animation.source_image = image.texture
+	new_animation.source_image_path = image.get_path()
+	new_animation.source_sprite = image
 	new_animation.cells = cells
-	#generate a new uuid using the current time
-	new_animation.uuid = int(Time.get_unix_time_from_system())
 
 	# save the animation to a file using resourceSaver
-	var result = ResourceSaver.save(new_animation, animations_folder + "animation_" + str(new_animation.uuid) + ".tres")
+	var file_manager = FileManager.new()
+	var file_dict = new_animation.to_dict()
+	var file_name : String = "animation_" + new_animation.name + str(new_animation.uuid) + ".json"
 
-	if result == OK:
-		print("Animation saved successfully with id: ", new_animation.uuid)
+	var result = file_manager.save_file(animations_folder, file_name, file_dict)
+
+	if result:
+		print("Animation ", file_name, " has been saved")
+		_update_file_list()
 	else:
 		print("Failed to save animation")
 
-
-01,3
-func _load_animation_from_file(path: String) -> AnimationInstance:
-
-	var animation : AnimationInstance = ResourceLoader.load(path)
+func _load_animation_from_file(path: String, file_name) -> AnimationInstance:
+	var animation_dict = FileManager.new().load_file(path, file_name)
+	var animation = AnimationInstance.new()
+	animation.from_dict(animation_dict)
 	print("Loaded animation: " + animation.name)
 	print("UUID: " + str(animation.uuid))
 	print("Cells: " + str(animation.cells.size()))
 	return animation
- 6æ7ujK(ÞIL
- -
